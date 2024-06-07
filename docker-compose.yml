@@ -1,0 +1,46 @@
+version: '3'
+services:
+    fastapi:
+        container_name: fastapi
+        build:
+            context: FastAPI
+        restart: always
+        ports:
+            - "8000:8000"
+        environment:
+            - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+            - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+            - USER_BUCKET_NAME=${USER_BUCKET_NAME}
+            - AWS_LOGS_ACCESS_KEY=${AWS_LOGS_ACCESS_KEY}
+            - AWS_LOGS_SECRET_KEY=${AWS_LOGS_SECRET_KEY}
+            - ALPHA_VANTAGE_API_KEY=${ALPHA_VANTAGE_API_KEY}
+            - NEWS_API_KEY=${NEWS_API_KEY}
+            - OPENAI_API_KEY=${OPENAI_API_KEY}
+        networks:
+            - airflow_default
+
+    streamlit:
+        container_name: streamlit
+        build:
+            context: Streamlit
+        restart: always
+        ports:
+            - "8050:8050"
+        depends_on:
+            - fastapi
+        environment:
+            - API_URL=http://fastapi:8000
+            - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+            - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+            - USER_BUCKET_NAME=${USER_BUCKET_NAME}
+            - AWS_LOGS_ACCESS_KEY=${AWS_LOGS_ACCESS_KEY}
+            - AWS_LOGS_SECRET_KEY=${AWS_LOGS_SECRET_KEY}
+            - ALPHA_VANTAGE_API_KEY=${ALPHA_VANTAGE_API_KEY}
+            - NEWS_API_KEY=${NEWS_API_KEY}
+            - OPENAI_API_KEY=${OPENAI_API_KEY}
+        networks:
+            - airflow_default
+
+networks:
+    airflow_default:
+        external: true
